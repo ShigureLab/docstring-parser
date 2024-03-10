@@ -1,12 +1,12 @@
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct Argument {
     pub name: String,
-    pub typ: Option<String>,
+    pub r#type: Option<String>,
     pub desc: Vec<String>,
 }
 
-#[derive(PartialEq, Debug)]
-pub enum DescriptionParagraph {
+#[derive(PartialEq, Debug, Clone)]
+pub enum DocstringParagraph {
     Raw(String),
     Warning(String),
     Note(String),
@@ -15,4 +15,4 @@ pub enum DescriptionParagraph {
     Examples(Vec<String>),
 }
 
-pub type Docstring = Vec<DescriptionParagraph>;
+pub type Docstring = Vec<DocstringParagraph>;

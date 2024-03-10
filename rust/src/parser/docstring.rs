@@ -5,7 +5,7 @@ use crate::indent::{calc_indent_size, is_indent_char};
 use crate::parser::argument::parse_args;
 use crate::parser::common::{next_line, ParseResult};
 use crate::parser::plain_paragraph::parse_plain_paragraph;
-use crate::schema::{Argument, DescriptionParagraph, Docstring};
+use crate::schema::{Argument, Docstring, DocstringParagraph};
 use crate::utils::cleandoc;
 pub enum DocstringTitle {
     Args,
@@ -50,7 +50,7 @@ impl DocstringTitle {
     }
 }
 
-fn parse_docstring(input: &mut Cursor, ctx: &mut Context) -> ParseResult<Docstring> {
+pub fn parse_docstring(input: &mut Cursor, ctx: &mut Context) -> ParseResult<Docstring> {
     let mut docstring = vec![];
     loop {
         if input.eof() {
@@ -64,7 +64,7 @@ fn parse_docstring(input: &mut Cursor, ctx: &mut Context) -> ParseResult<Docstri
         {
             let indent = line.chars().take_while(|c| is_indent_char(*c)).count();
             let ctx_guard = ctx.guard(Context::new(indent));
-            docstring.push(DescriptionParagraph::Args(parse_args(input, ctx)?));
+            docstring.push(DocstringParagraph::Args(parse_args(input, ctx)?));
             ctx_guard.restore(ctx);
         } else if DocstringTitle::returns_heads()
             .iter()
@@ -72,7 +72,7 @@ fn parse_docstring(input: &mut Cursor, ctx: &mut Context) -> ParseResult<Docstri
         {
             let indent = line.chars().take_while(|c| is_indent_char(*c)).count();
             let ctx_guard = ctx.guard(Context::new(indent));
-            docstring.push(DescriptionParagraph::Returns(parse_plain_paragraph(
+            docstring.push(DocstringParagraph::Returns(parse_plain_paragraph(
                 input, ctx,
             )?));
             ctx_guard.restore(ctx);
@@ -82,12 +82,12 @@ fn parse_docstring(input: &mut Cursor, ctx: &mut Context) -> ParseResult<Docstri
         {
             let indent = line.chars().take_while(|c| is_indent_char(*c)).count();
             let ctx_guard = ctx.guard(Context::new(indent));
-            docstring.push(DescriptionParagraph::Examples(parse_plain_paragraph(
+            docstring.push(DocstringParagraph::Examples(parse_plain_paragraph(
                 input, ctx,
             )?));
             ctx_guard.restore(ctx);
         } else {
-            docstring.push(DescriptionParagraph::Raw(line));
+            docstring.push(DocstringParagraph::Raw(line));
         }
     }
     Ok(docstring)
@@ -110,9 +110,9 @@ mod tests {
         let mut ctx = Context::new(4);
         assert_eq!(
             parse_docstring(&mut cursor, &mut ctx),
-            Ok(vec![DescriptionParagraph::Args(vec![Argument {
+            Ok(vec![DocstringParagraph::Args(vec![Argument {
                 name: "arg1".to_string(),
-                typ: Some("int".to_string()),
+                r#type: Some("int".to_string()),
                 desc: vec!["Description of arg1".to_string()]
             }])])
         );
@@ -137,15 +137,15 @@ mod tests {
 
         assert_eq!(
             parse_docstring(&mut cursor, &mut ctx),
-            Ok(vec![DescriptionParagraph::Args(vec![
+            Ok(vec![DocstringParagraph::Args(vec![
                 Argument {
                     name: "arg1".to_string(),
-                    typ: Some("int".to_string()),
+                    r#type: Some("int".to_string()),
                     desc: vec!["Description of arg1".to_string()]
                 },
                 Argument {
                     name: "arg2".to_string(),
-                    typ: Some("str".to_string()),
+                    r#type: Some("str".to_string()),
                     desc: vec![
                         "Description of arg2".to_string(),
                         "line 2 of arg2".to_string(),
@@ -154,7 +154,7 @@ mod tests {
                 },
                 Argument {
                     name: "arg3".to_string(),
-                    typ: Some("float".to_string()),
+                    r#type: Some("float".to_string()),
                     desc: vec![
                         "Description of arg3".to_string(),
                         "line 2 of arg3".to_string()
@@ -180,12 +180,12 @@ mod tests {
         assert_eq!(
             parse_docstring(&mut cursor, &mut ctx),
             Ok(vec![
-                DescriptionParagraph::Args(vec![Argument {
+                DocstringParagraph::Args(vec![Argument {
                     name: "arg1".to_string(),
-                    typ: Some("int".to_string()),
+                    r#type: Some("int".to_string()),
                     desc: vec!["Description of arg1".to_string()]
                 }]),
-                DescriptionParagraph::Returns(vec!["Description of return value".to_string()])
+                DocstringParagraph::Returns(vec!["Description of return value".to_string()])
             ])
         );
     }
@@ -209,12 +209,12 @@ mod tests {
         assert_eq!(
             parse_docstring(&mut cursor, &mut ctx),
             Ok(vec![
-                DescriptionParagraph::Args(vec![Argument {
+                DocstringParagraph::Args(vec![Argument {
                     name: "arg1".to_string(),
-                    typ: Some("int".to_string()),
+                    r#type: Some("int".to_string()),
                     desc: vec!["Description of arg1".to_string()]
                 }]),
-                DescriptionParagraph::Examples(vec![
+                DocstringParagraph::Examples(vec![
                     "".to_string(),
                     ">>> from docstring_parser import parse".to_string(),
                     ">>> parse('Args: arg1 (int): Description of arg1')".to_string(),

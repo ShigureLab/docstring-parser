@@ -14,7 +14,7 @@ def test_parse_args():
         arg2 (str, optional): Description of arg2
     """
     docstring = prepare_doc(docstring)
-    args = parse_args(docstring)
-    print(args)
+    parsed_doc = parse(docstring)
+    print(parsed_doc)
     # breakpoint()
     raise

@@ -13,10 +13,10 @@ pub fn parse_arg<'a>(input: &'a mut Cursor, ctx: &mut Context) -> ParseResult<Ar
     let name = identifier(input, ctx)?;
 
     input.eat_whitespace();
-    let mut typ: Option<String> = None;
+    let mut r#type: Option<String> = None;
     if let Some(_c @ '(') = input.peek() {
         input.eat_string("(")?;
-        typ = Some(input.take_until(|c| c == ')').to_string());
+        r#type = Some(input.take_until(|c| c == ')').to_string());
         input.eat_string(")")?;
         input.eat_whitespace();
     }
@@ -28,7 +28,7 @@ pub fn parse_arg<'a>(input: &'a mut Cursor, ctx: &mut Context) -> ParseResult<Ar
     if next_indent_size > ctx.indent {
         desc.extend(indented_paragraph(input, ctx)?)
     }
-    Ok(Argument { name, typ, desc })
+    Ok(Argument { name, r#type, desc })
 }
 
 pub fn parse_args<'a>(
@@ -65,7 +65,7 @@ mod tests {
             parse_arg(&mut cursor, &mut ctx),
             Ok(Argument {
                 name: "arg1".to_string(),
-                typ: Some("int".to_string()),
+                r#type: Some("int".to_string()),
                 desc: vec!["Description of arg1".to_string(),]
             })
         );
@@ -80,7 +80,7 @@ mod tests {
             parse_arg(&mut cursor, &mut ctx),
             Ok(Argument {
                 name: "arg1".to_string(),
-                typ: None,
+                r#type: None,
                 desc: vec!["Description of arg1".to_string(),]
             })
         );
@@ -95,7 +95,7 @@ mod tests {
             parse_arg(&mut cursor, &mut ctx),
             Ok(Argument {
                 name: "arg1".to_string(),
-                typ: Some("int".to_string()),
+                r#type: Some("int".to_string()),
                 desc: vec![
                     "Description of arg1".to_string(),
                     "multi line".to_string(),
@@ -114,7 +114,7 @@ mod tests {
             parse_args(&mut cursor, &mut ctx),
             Ok(vec![Argument {
                 name: "arg1".to_string(),
-                typ: Some("int".to_string()),
+                r#type: Some("int".to_string()),
                 desc: vec!["Description of arg1".to_string(),]
             }])
         );
@@ -129,7 +129,7 @@ mod tests {
             parse_args(&mut cursor, &mut ctx),
             Ok(vec![Argument {
                 name: "arg1".to_string(),
-                typ: Some("int".to_string()),
+                r#type: Some("int".to_string()),
                 desc: vec![
                     "Description of arg1".to_string(),
                     "multi line".to_string(),
@@ -149,12 +149,12 @@ mod tests {
             Ok(vec![
                 Argument {
                     name: "arg1".to_string(),
-                    typ: Some("int".to_string()),
+                    r#type: Some("int".to_string()),
                     desc: vec!["Description of arg1".to_string(),]
                 },
                 Argument {
                     name: "arg2".to_string(),
-                    typ: Some("str".to_string()),
+                    r#type: Some("str".to_string()),
                     desc: vec!["Description of arg2".to_string(),]
                 }
             ])
@@ -186,7 +186,7 @@ mod tests {
             Ok(vec![
                 Argument {
                     name: "arg1".to_string(),
-                    typ: Some("int".to_string()),
+                    r#type: Some("int".to_string()),
                     desc: vec![
                         "Description of arg1".to_string(),
                         "multi line".to_string(),
@@ -196,7 +196,7 @@ mod tests {
                 },
                 Argument {
                     name: "arg2".to_string(),
-                    typ: Some("str".to_string()),
+                    r#type: Some("str".to_string()),
                     desc: vec![
                         "Description of arg2".to_string(),
                         "multi line".to_string(),

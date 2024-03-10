@@ -24,7 +24,7 @@ impl ParseError {
         ParseError::UnexpectedEnd(UnexpectedEnd { pos })
     }
 
-    fn format(&self) -> String {
+    pub fn format(&self) -> String {
         match self {
             ParseError::UnexpectedEnd(e) => format!("Unexpected end at {}", e.pos),
             ParseError::InvalidValue(e) => format!("Invalid value at {}: {}", e.pos, e.message),
