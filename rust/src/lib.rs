@@ -13,7 +13,6 @@ use crate::parser::docstring::parse_docstring;
 use crate::schema::{Argument, Docstring, DocstringParagraph};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
-use pyo3::types::PyList;
 
 #[pyclass]
 struct PyArgument {
@@ -131,7 +130,7 @@ fn parse(input: &str) -> PyResult<PyDocstring> {
 /// A Python module implemented in Rust.
 #[pymodule]
 #[pyo3(name = "_core")]
-fn docstring_parser(_py: Python, m: &PyModule) -> PyResult<()> {
+fn docstring_parser(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(parse, m)?)?;
     Ok(())
 }
