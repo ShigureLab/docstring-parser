@@ -10,5 +10,5 @@ crate-type = ["cdylib"]
 
 [dependencies]
 indoc = "2.0.4"
-pyo3 = "0.21.0-beta.0"
+pyo3 = "0.21.0"
 textwrap = "0.16.1"
